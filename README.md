@@ -8,11 +8,11 @@ An end-to-end MLOps pipeline for training and serving a PyTorch image classifica
 2.  **Containerization**: Multi-stage Dockerfiles for optimized training and serving images.
 3.  **Orchestration**: Kubernetes manifests for a training Job and a scalable serving Deployment.
 
-## Setup Instructions
+## Setup Instructions (Windows PowerShell)
 
 ### 1. Build Docker Images
 
-```bash
+```powershell
 # Build training image
 docker build -f docker/Dockerfile.train -t mlops-train:v1 .
 
@@ -22,22 +22,17 @@ docker build -f docker/Dockerfile.serve -t mlops-serve:v1 .
 
 ### 2. Local Training & Serving (Docker)
 
-```bash
+```powershell
 # Run training with mounted volumes
-docker run --rm \
-  -v $(pwd)/data:/app/data \
-  -v $(pwd)/checkpoints:/app/checkpoints \
-  mlops-train:v1
+docker run --rm -v "${PWD}/data:/app/data" -v "${PWD}/checkpoints:/app/checkpoints" mlops-train:v1
 
 # Run serving
-docker run --rm -p 8080:8080 \
-  -v $(pwd)/checkpoints:/app/checkpoints \
-  mlops-serve:v1
+docker run --rm -p 8080:8080 -v "${PWD}/checkpoints:/app/checkpoints" mlops-serve:v1
 ```
 
 ### 3. Kubernetes Deployment
 
-```bash
+```powershell
 # Apply namespace and config
 kubectl apply -f k8s/namespace.yaml
 kubectl apply -f k8s/configmap.yaml
@@ -53,11 +48,10 @@ kubectl apply -f k8s/hpa.yaml
 
 ### 4. Testing the Endpoint
 
-```bash
-# Port-forward for local testing
+```powershell
+# Port-forward for local testing (Open this in a separate PowerShell window)
 kubectl port-forward svc/model-serving 8080:80 -n ml-training
 
-# Send a prediction request
-curl -X POST http://localhost:8080/predict \
-  -F "image=@test_image.png"
+# Send a prediction request using curl.exe
+curl.exe -X POST http://localhost:8080/predict -F "image=@test_image.png"
 ```
