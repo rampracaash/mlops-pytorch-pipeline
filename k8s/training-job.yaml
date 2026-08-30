@@ -14,11 +14,11 @@ spec:
           requests:
             cpu: "2"
             memory: "4Gi"
-            nvidia.com/gpu: "1"
+            # nvidia.com/gpu: "1" # Commented out so it can run locally without a GPU
           limits:
             cpu: "2"
             memory: "4Gi"
-            nvidia.com/gpu: "1"
+            # nvidia.com/gpu: "1" # Commented out so it can run locally without a GPU
         volumeMounts:
         - name: config-volume
           mountPath: /app/configs
@@ -37,10 +37,10 @@ spec:
       - name: checkpoint-volume
         persistentVolumeClaim:
           claimName: checkpoint-pvc
-      tolerations:
-      - key: "nvidia.com/gpu"
-        operator: "Exists"
-        effect: "NoSchedule"
+      # tolerations:
+      # - key: "nvidia.com/gpu"
+      #   operator: "Exists"
+      #   effect: "NoSchedule"
   backoffLimit: 4
 ---
 apiVersion: v1
