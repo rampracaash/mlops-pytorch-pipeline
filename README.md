@@ -4,6 +4,36 @@ An end-to-end MLOps pipeline for training and serving a PyTorch image classifica
 
 ## Architecture
 
+```mermaid
+graph TD
+    subgraph Kubernetes Cluster [Kubernetes Cluster]
+        CM[ConfigMap: training-config]
+        
+        subgraph Training Layer
+            TJ[Job: pytorch-training-job]
+        end
+        
+        subgraph Serving Layer
+            HPA[Horizontal Pod Autoscaler]
+            SVC[Service: model-serving port 80]
+            DEP[Deployment: model-serving replicas: 2]
+            
+            HPA -->|Scales| DEP
+            SVC -->|Routes Traffic| DEP
+        end
+        
+        PVC1[(PVC: data-pvc)]
+        PVC2[(PVC: checkpoint-pvc)]
+        
+        CM -.->|Mounts| TJ
+        TJ -->|Downloads/Reads| PVC1
+        TJ -->|Saves Model| PVC2
+        DEP -->|Loads Model| PVC2
+    end
+    
+    User -->|POST /predict| SVC
+```
+
 1.  **Training**: A PyTorch ResNet-18 model trained on CIFAR-10.
 2.  **Containerization**: Multi-stage Dockerfiles for optimized training and serving images.
 3.  **Orchestration**: Kubernetes manifests for a training Job and a scalable serving Deployment.
